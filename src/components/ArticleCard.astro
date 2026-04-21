@@ -21,7 +21,7 @@ const {
 ---
 
 <article class:list={['card', { 'card--featured': featured }]}>
-  <a href={`/articulo/${slug}`} class="card-image-link" tabindex="-1" aria-hidden="true">
+  <a href={`/articulos/${slug}`} class="card-image-link" tabindex="-1" aria-hidden="true">
     <div class="card-image img-placeholder">
       <span>{imagePlaceholderLabel}</span>
     </div>
@@ -33,12 +33,12 @@ const {
     </a>
 
     <h3 class="card-title">
-      <a href={`/articulo/${slug}`}>{title}</a>
+      <a href={`/articulos/${slug}`}>{title}</a>
     </h3>
 
     <p class="card-excerpt">{excerpt}</p>
 
-    <a href={`/articulo/${slug}`} class="card-read-more" aria-label={`Leer: ${title}`}>
+    <a href={`/articulos/${slug}`} class="card-read-more" aria-label={`Leer: ${title}`}>
       Leer artículo →
     </a>
   </div>
