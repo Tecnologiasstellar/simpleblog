@@ -1,0 +1,253 @@
+---
+const navItems = [
+  { label: 'Técnicas', href: '/categoria/tecnicas-para-dormir' },
+  { label: 'Higiene del Sueño', href: '/categoria/higiene-del-sueno' },
+  { label: 'Remedios Naturales', href: '/categoria/remedios-naturales' },
+  { label: 'Trastornos', href: '/categoria/trastornos-del-sueno' },
+  { label: 'Ciencia', href: '/categoria/ciencia-del-sueno' },
+  { label: 'Nutrición', href: '/categoria/nutricion-y-sueno' },
+  { label: 'Más', href: '/categorias' },
+];
+---
+
+<header class="header">
+  <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true" />
+
+  <div class="container header-inner">
+    <!-- Logo -->
+    <a href="/" class="logo" aria-label="Sueño Profundo — Inicio">
+      <span class="logo-icon" aria-hidden="true">🌙</span>
+      <span class="logo-text">Sueño<strong>Profundo</strong></span>
+    </a>
+
+    <!-- Desktop Nav -->
+    <nav class="nav" aria-label="Navegación principal">
+      <ul class="nav-list">
+        {navItems.map(item => (
+          <li>
+            <a href={item.href} class="nav-link">{item.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <button class="search-btn" aria-label="Buscar artículos">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
+      <label for="nav-toggle" class="hamburger" aria-label="Abrir menú">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Mobile Nav Drawer — sibling of nav-toggle input -->
+  <div class="mobile-nav">
+    <nav aria-label="Menú móvil">
+      <ul class="mobile-nav-list">
+        {navItems.map(item => (
+          <li>
+            <a href={item.href} class="mobile-nav-link">{item.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: rgba(250, 248, 245, 0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--color-border-light);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+    gap: var(--space-6);
+  }
+
+  /* Logo */
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+
+  .logo-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  .logo-text {
+    font-family: var(--font-body);
+    font-size: var(--text-xl);
+    font-weight: 300;
+    color: var(--color-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .logo-text strong {
+    font-weight: 700;
+  }
+
+  /* Desktop Nav */
+  .nav {
+    flex: 1;
+  }
+
+  .nav-list {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .nav-link {
+    display: block;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast), background-color var(--transition-fast);
+    white-space: nowrap;
+  }
+
+  .nav-link:hover {
+    color: var(--color-primary);
+    background-color: var(--color-bg-blue);
+  }
+
+  /* Header Actions */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-shrink: 0;
+  }
+
+  .search-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast), background-color var(--transition-fast);
+  }
+
+  .search-btn:hover {
+    color: var(--color-primary);
+    background-color: var(--color-bg-blue);
+  }
+
+  /* Hamburger — hidden on desktop */
+  .nav-toggle {
+    display: none;
+  }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+  }
+
+  .hamburger:hover {
+    background-color: var(--color-bg-blue);
+  }
+
+  .hamburger-line {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background-color: var(--color-primary);
+    border-radius: var(--radius-full);
+    transition: all var(--transition);
+  }
+
+  /* Mobile Nav Drawer — hidden by default */
+  .mobile-nav {
+    display: none;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height var(--transition-slow);
+    background-color: var(--color-surface);
+    border-top: 1px solid var(--color-border-light);
+  }
+
+  .mobile-nav-list {
+    padding: var(--space-4) var(--space-4) var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .mobile-nav-link {
+    display: block;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text);
+    border-radius: var(--radius-md);
+    transition: color var(--transition-fast), background-color var(--transition-fast);
+  }
+
+  .mobile-nav-link:hover {
+    color: var(--color-primary);
+    background-color: var(--color-bg-blue);
+  }
+
+  /* Hamburger animation when checked */
+  .nav-toggle:checked ~ .header-inner .hamburger-line:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .nav-toggle:checked ~ .header-inner .hamburger-line:nth-child(2) {
+    opacity: 0;
+  }
+
+  .nav-toggle:checked ~ .header-inner .hamburger-line:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .nav-toggle:checked ~ .mobile-nav {
+    max-height: 400px;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .nav {
+      display: none;
+    }
+
+    .hamburger {
+      display: flex;
+    }
+
+    .mobile-nav {
+      display: block;
+    }
+  }
+</style>
