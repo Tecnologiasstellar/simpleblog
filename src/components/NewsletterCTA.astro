@@ -1,0 +1,225 @@
+---
+---
+
+<section class="newsletter" aria-labelledby="newsletter-heading">
+  <div class="newsletter-bg" aria-hidden="true">
+    <div class="newsletter-stars"></div>
+  </div>
+
+  <div class="container newsletter-inner">
+    <div class="newsletter-icon" aria-hidden="true">🌙</div>
+    <h2 class="newsletter-title" id="newsletter-heading">
+      Recibe consejos para dormir mejor cada semana
+    </h2>
+    <p class="newsletter-subtitle">
+      Únete a miles de hispanohablantes que ya duermen mejor. Sin spam, solo lo que importa.
+    </p>
+
+    <form class="newsletter-form" action="#" method="post" novalidate>
+      <div class="form-group">
+        <label for="email-input" class="sr-only">Tu correo electrónico</label>
+        <input
+          type="email"
+          id="email-input"
+          name="email"
+          class="email-input"
+          placeholder="tu@correo.com"
+          required
+          autocomplete="email"
+        />
+        <button type="submit" class="btn btn-primary submit-btn">
+          Suscribirme gratis
+        </button>
+      </div>
+      <p class="form-disclaimer">
+        Al suscribirte aceptas nuestra <a href="/privacidad" class="disclaimer-link">política de privacidad</a>. Puedes darte de baja cuando quieras.
+      </p>
+    </form>
+
+    <div class="newsletter-benefits" aria-label="Beneficios de suscribirse">
+      <div class="benefit">
+        <span aria-hidden="true">✓</span>
+        <span>Técnicas nuevas cada semana</span>
+      </div>
+      <div class="benefit">
+        <span aria-hidden="true">✓</span>
+        <span>Resúmenes de investigación científica</span>
+      </div>
+      <div class="benefit">
+        <span aria-hidden="true">✓</span>
+        <span>Completamente gratuito</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .newsletter {
+    position: relative;
+    background: linear-gradient(135deg, #1A1A2E 0%, #2D3A8C 60%, #16213E 100%);
+    padding: var(--space-20) 0;
+    overflow: hidden;
+  }
+
+  .newsletter-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.4;
+  }
+
+  .newsletter-stars {
+    width: 100%;
+    height: 100%;
+    background-image:
+      radial-gradient(1px 1px at 15% 20%, white 0%, transparent 100%),
+      radial-gradient(1px 1px at 35% 60%, white 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 55% 10%, white 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 45%, white 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 90% 75%, white 0%, transparent 100%),
+      radial-gradient(1px 1px at 5% 80%, white 0%, transparent 100%),
+      radial-gradient(2px 2px at 50% 30%, white 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 15%, white 0%, transparent 100%);
+    background-size: 100% 100%;
+  }
+
+  .newsletter-inner {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .newsletter-icon {
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: var(--space-4);
+    display: block;
+  }
+
+  .newsletter-title {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    color: var(--color-text-light);
+    margin-bottom: var(--space-4);
+    line-height: 1.2;
+  }
+
+  .newsletter-subtitle {
+    font-size: var(--text-lg);
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: var(--space-10);
+    line-height: 1.65;
+  }
+
+  /* Form */
+  .newsletter-form {
+    margin-bottom: var(--space-8);
+  }
+
+  .form-group {
+    display: flex;
+    gap: var(--space-3);
+    max-width: 520px;
+    margin: 0 auto var(--space-4);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .email-input {
+    flex: 1;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-full);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--color-text-light);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    outline: none;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+  }
+
+  .email-input::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+  }
+
+  .email-input:focus {
+    border-color: var(--color-secondary);
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .submit-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .form-disclaimer {
+    font-size: var(--text-xs);
+    color: rgba(255, 255, 255, 0.45);
+    line-height: 1.5;
+  }
+
+  .disclaimer-link {
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .disclaimer-link:hover {
+    color: var(--color-text-light);
+  }
+
+  /* Benefits */
+  .newsletter-benefits {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-8);
+    flex-wrap: wrap;
+  }
+
+  .benefit {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .benefit > span:first-child {
+    color: var(--color-success);
+    font-size: var(--text-base);
+  }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .newsletter-title {
+      font-size: var(--text-3xl);
+    }
+
+    .form-group {
+      flex-direction: column;
+    }
+
+    .submit-btn {
+      width: 100%;
+    }
+
+    .newsletter-benefits {
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+    }
+  }
+</style>
