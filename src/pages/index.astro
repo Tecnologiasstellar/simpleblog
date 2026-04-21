@@ -1,13 +1,129 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import HeroSection from '../components/HeroSection.astro';
+import CategoryGrid from '../components/CategoryGrid.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import AboutSection from '../components/AboutSection.astro';
+import NewsletterCTA from '../components/NewsletterCTA.astro';
+
+const recentArticles = [
+  {
+    title: 'Melatonina: Todo lo que Necesitas Saber',
+    excerpt: 'La melatonina es la hormona del sueño, pero ¿realmente funciona como suplemento? Analizamos la evidencia científica.',
+    category: 'Ciencia del Sueño',
+    categorySlug: 'ciencia-del-sueno',
+    slug: 'melatonina-guia-completa',
+    imagePlaceholderLabel: 'Ilustración de ciclo circadiano',
+  },
+  {
+    title: 'Cómo el Estrés Destruye Tu Sueño (y Cómo Detenerlo)',
+    excerpt: 'El cortisol, la hormona del estrés, y el sueño están íntimamente relacionados. Aprende a romper el ciclo vicioso.',
+    category: 'Higiene del Sueño',
+    categorySlug: 'higiene-del-sueno',
+    slug: 'estres-y-sueno-como-manejarlos',
+    imagePlaceholderLabel: 'Persona estresada por la noche',
+  },
+  {
+    title: 'Rutina Nocturna de 30 Minutos para Dormir Profundo',
+    excerpt: 'Una rutina consistente antes de dormir prepara tu cerebro para el descanso. Te mostramos cómo crear la tuya.',
+    category: 'Técnicas para Dormir',
+    categorySlug: 'tecnicas-para-dormir',
+    slug: 'rutina-nocturna-30-minutos',
+    imagePlaceholderLabel: 'Rutina nocturna relajante',
+  },
+  {
+    title: 'Apnea del Sueño: Señales que No Debes Ignorar',
+    excerpt: 'La apnea del sueño afecta a millones sin saberlo. Conoce los síntomas clave y cuándo consultar a un médico.',
+    category: 'Trastornos del Sueño',
+    categorySlug: 'trastornos-del-sueno',
+    slug: 'apnea-del-sueno-senales',
+    imagePlaceholderLabel: 'Persona durmiendo con ronquidos',
+  },
+];
 ---
 
 <BaseLayout title="Sueño Profundo — Tu guía para dormir mejor">
   <Header />
+
   <main>
-    <div class="container" style="padding-top: 2rem">
-      <h1>Sueño Profundo</h1>
-    </div>
+    <HeroSection />
+    <CategoryGrid />
+
+    <!-- Artículos Recientes -->
+    <section class="recent-articles section" aria-labelledby="recent-heading">
+      <div class="container">
+        <div class="section-header recent-header">
+          <div>
+            <h2 class="section-title" id="recent-heading">Artículos Recientes</h2>
+            <p class="section-subtitle">Lo último de nuestro equipo editorial.</p>
+          </div>
+          <a href="/articulos" class="view-all-link" aria-label="Ver todos los artículos recientes">
+            Ver todos →
+          </a>
+        </div>
+        <div class="recent-grid">
+          {recentArticles.map(article => (
+            <ArticleCard {...article} />
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <AboutSection />
+    <NewsletterCTA />
   </main>
+
+  <Footer />
 </BaseLayout>
+
+<style>
+  .recent-articles {
+    background-color: var(--color-bg);
+  }
+
+  .recent-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .view-all-link {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    color: var(--color-primary);
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: color var(--transition-fast);
+    padding-bottom: var(--space-1);
+  }
+
+  .view-all-link:hover {
+    color: var(--color-secondary);
+  }
+
+  .recent-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-6);
+  }
+
+  @media (max-width: 1024px) {
+    .recent-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .recent-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .recent-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
