@@ -1,0 +1,97 @@
+---
+import { client, categoryToSlug } from "../../lib/sanity";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+
+const articles = await client.fetch<
+  {
+    title: string;
+    slug: { current: string };
+    publishedAt: string;
+    category: string;
+    excerpt: string;
+  }[]
+>(`
+  *[_type == "article"] | order(publishedAt desc) {
+    title,
+    slug,
+    publishedAt,
+    category,
+    excerpt
+  }
+`).catch(() => []);
+---
+
+<BaseLayout
+  title="Artículos sobre sueño | Sueño Profundo"
+  description="Guías, consejos y recursos para dormir mejor. Explora todos nuestros artículos sobre sueño saludable."
+>
+  <main class="archive">
+    <header class="archive-header">
+      <nav aria-label="Migas de pan" class="breadcrumb">
+        <a href="/">Inicio</a>
+        <span aria-hidden="true">›</span>
+        <span aria-current="page">Artículos</span>
+      </nav>
+      <h1 class="archive-title">Todos los artículos</h1>
+      <p class="archive-subtitle">
+        {articles.length} artículo{articles.length !== 1 ? "s" : ""} publicado{articles.length !== 1 ? "s" : ""}
+      </p>
+    </header>
+
+    <div class="article-grid">
+      {articles.map((article) => (
+        <ArticleCard
+          title={article.title}
+          excerpt={article.excerpt}
+          category={article.category}
+          categorySlug={categoryToSlug(article.category)}
+          slug={article.slug.current}
+        />
+      ))}
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .archive {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-10) var(--space-5);
+  }
+
+  .archive-header {
+    margin-bottom: var(--space-10);
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+  }
+
+  .breadcrumb a {
+    color: var(--color-primary);
+  }
+
+  .archive-title {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    margin: 0 0 var(--space-2);
+  }
+
+  .archive-subtitle {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    margin: 0;
+  }
+
+  .article-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-8);
+  }
+</style>

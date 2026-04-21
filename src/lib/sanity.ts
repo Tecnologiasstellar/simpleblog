@@ -3,21 +3,28 @@ import { createClient } from "@sanity/client";
 import imageUrlBuilder from "@sanity/image-url";
 import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
 
-const projectId = import.meta.env.PUBLIC_SANITY_PROJECT_ID;
-if (!projectId) {
-  throw new Error("Missing required env var: PUBLIC_SANITY_PROJECT_ID");
-}
+const projectId = import.meta.env.PUBLIC_SANITY_PROJECT_ID ?? "";
 
-export const client = createClient({
-  projectId,
-  dataset: import.meta.env.PUBLIC_SANITY_DATASET ?? "production",
-  useCdn: true,
-  apiVersion: "2024-01-01",
-});
+// Create a stub client that returns empty results when projectId is not configured
+const noopClient = {
+  fetch: async () => [],
+} as unknown as ReturnType<typeof createClient>;
 
-const builder = imageUrlBuilder(client);
+export const client = projectId
+  ? createClient({
+      projectId,
+      dataset: import.meta.env.PUBLIC_SANITY_DATASET ?? "production",
+      useCdn: true,
+      apiVersion: "2024-01-01",
+    })
+  : noopClient;
+
+const builder = projectId
+  ? imageUrlBuilder(client as ReturnType<typeof createClient>)
+  : null;
 
 export function urlFor(source: SanityImageSource) {
+  if (!builder) return { url: () => "" } as ReturnType<ReturnType<typeof imageUrlBuilder>["image"]>;
   return builder.image(source);
 }
 
