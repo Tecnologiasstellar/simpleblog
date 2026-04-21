@@ -1,0 +1,286 @@
+---
+import ArticleCard from './ArticleCard.astro';
+
+const featuredArticles = [
+  {
+    title: '10 Técnicas de Relajación para Dormirte en Minutos',
+    excerpt: 'Descubre métodos respaldados por la ciencia para calmar tu mente y preparar tu cuerpo para un sueño profundo.',
+    category: 'Técnicas para Dormir',
+    categorySlug: 'tecnicas-para-dormir',
+    slug: 'tecnicas-relajacion-dormirte-rapido',
+    imagePlaceholderLabel: 'Persona relajada meditando',
+    featured: true,
+  },
+  {
+    title: 'Qué Comer (y Evitar) para Dormir Mejor Esta Noche',
+    excerpt: 'La alimentación tiene un impacto directo en la calidad del sueño. Aquí te explicamos qué alimentos te ayudan y cuáles debes evitar.',
+    category: 'Nutrición y Sueño',
+    categorySlug: 'nutricion-y-sueno',
+    slug: 'alimentos-para-dormir-mejor',
+    imagePlaceholderLabel: 'Alimentos saludables para el sueño',
+    featured: true,
+  },
+  {
+    title: 'Insomnio: Causas, Síntomas y Soluciones Naturales',
+    excerpt: 'El insomnio afecta a millones sin saberlo. Conoce los síntomas clave y qué puedes hacer para superarlo sin medicamentos.',
+    category: 'Trastornos del Sueño',
+    categorySlug: 'trastornos-del-sueno',
+    slug: 'insomnio-causas-soluciones-naturales',
+    imagePlaceholderLabel: 'Persona despierta por la noche',
+    featured: true,
+  },
+];
+---
+
+<section class="hero" aria-label="Sección principal">
+  <!-- Night sky background -->
+  <div class="hero-bg" aria-hidden="true">
+    <div class="stars stars-sm"></div>
+    <div class="stars stars-md"></div>
+    <div class="stars stars-lg"></div>
+    <div class="moon"></div>
+  </div>
+
+  <div class="container hero-content">
+    <div class="hero-text">
+      <span class="hero-eyebrow">Bienvenido a Sueño Profundo</span>
+      <h1 class="hero-title">Tu guía para<br /><em>dormir mejor</em></h1>
+      <p class="hero-subtitle">
+        Técnicas, remedios naturales y ciencia del sueño — todo en español, para que descanses como mereces.
+      </p>
+      <div class="hero-actions">
+        <a href="/categorias" class="btn btn-primary">Explorar categorías</a>
+        <a href="/acerca-de" class="btn btn-outline-light">Conoce nuestra misión</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wave transition to cream background -->
+  <div class="hero-wave" aria-hidden="true">
+    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#FAF8F5"/>
+    </svg>
+  </div>
+</section>
+
+<!-- Featured Articles -->
+<section class="featured-articles" aria-label="Artículos destacados">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Artículos Destacados</h2>
+      <p class="section-subtitle">Seleccionados por nuestro equipo editorial para comenzar tu viaje hacia el buen descanso.</p>
+    </div>
+    <div class="articles-grid">
+      {featuredArticles.map(article => (
+        <ArticleCard {...article} />
+      ))}
+    </div>
+    <div class="featured-cta">
+      <a href="/articulos" class="btn btn-secondary">Ver todos los artículos</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Hero */
+  .hero {
+    position: relative;
+    background: linear-gradient(160deg, #0D1B2A 0%, #1A1A2E 35%, #2D3A8C 70%, #16213E 100%);
+    padding: var(--space-24) 0 var(--space-16);
+    overflow: hidden;
+    min-height: 520px;
+  }
+
+  /* Stars via CSS radial-gradient */
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .stars {
+    position: absolute;
+    inset: 0;
+  }
+
+  .stars-sm {
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 40%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 40% 10%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 55%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 25%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 60%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 70%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 5%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 80%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 35% 90%, rgba(255,255,255,0.7) 0%, transparent 100%);
+    background-size: 100% 100%;
+    opacity: 0.6;
+  }
+
+  .stars-md {
+    background-image:
+      radial-gradient(1.5px 1.5px at 20% 8%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 45% 30%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 75% 15%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 92% 45%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 5% 50%, rgba(255,255,255,0.8) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 65% 65%, rgba(255,255,255,0.6) 0%, transparent 100%);
+    background-size: 100% 100%;
+    opacity: 0.7;
+  }
+
+  .stars-lg {
+    background-image:
+      radial-gradient(2px 2px at 30% 20%, rgba(255,255,255,0.95) 0%, transparent 100%),
+      radial-gradient(2px 2px at 80% 10%, rgba(255,255,255,1) 0%, transparent 100%),
+      radial-gradient(2px 2px at 55% 45%, rgba(255,255,255,0.85) 0%, transparent 100%),
+      radial-gradient(2.5px 2.5px at 10% 30%, rgba(255,255,255,0.9) 0%, transparent 100%),
+      radial-gradient(2px 2px at 95% 70%, rgba(124,140,248,0.9) 0%, transparent 100%);
+    background-size: 100% 100%;
+  }
+
+  /* Moon */
+  .moon {
+    position: absolute;
+    top: 8%;
+    right: 8%;
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-full);
+    background: radial-gradient(circle at 35% 35%, #FFF9E6, #F4E4B0 60%, #D4B870);
+    box-shadow:
+      0 0 20px rgba(244, 228, 176, 0.4),
+      0 0 60px rgba(244, 228, 176, 0.15),
+      inset -10px -5px 0 rgba(200, 170, 100, 0.3);
+  }
+
+  /* Hero content */
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+  }
+
+  .hero-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-secondary);
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: var(--text-6xl);
+    color: var(--color-text-light);
+    line-height: 1.1;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--color-secondary);
+  }
+
+  .hero-subtitle {
+    font-size: var(--text-xl);
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.65;
+    max-width: 540px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    padding-top: var(--space-4);
+  }
+
+  /* Wave */
+  .hero-wave {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 80px;
+  }
+
+  .hero-wave svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Featured Articles */
+  .featured-articles {
+    padding: var(--space-16) 0 var(--space-20);
+    background-color: var(--color-bg);
+  }
+
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    margin-bottom: var(--space-10);
+  }
+
+  .featured-cta {
+    text-align: center;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .hero-title {
+      font-size: var(--text-5xl);
+    }
+
+    .articles-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .articles-grid > :last-child {
+      grid-column: 1 / -1;
+      max-width: 480px;
+      justify-self: center;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      padding: var(--space-16) 0 var(--space-12);
+      min-height: auto;
+    }
+
+    .hero-title {
+      font-size: var(--text-4xl);
+    }
+
+    .hero-subtitle {
+      font-size: var(--text-base);
+    }
+
+    .moon {
+      width: 50px;
+      height: 50px;
+      top: 5%;
+      right: 5%;
+    }
+
+    .articles-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .articles-grid > :last-child {
+      grid-column: auto;
+      max-width: 100%;
+      justify-self: stretch;
+    }
+  }
+</style>
