@@ -1,0 +1,350 @@
+---
+import { PortableText } from "astro-portabletext";
+import { client, urlFor, formatDate, categoryToSlug } from "../../lib/sanity";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import type { PortableTextBlock } from "@portabletext/types";
+
+interface Step {
+  _key: string;
+  title: string;
+  description: string;
+}
+
+interface Article {
+  title: string;
+  slug: string;
+  publishedAt: string;
+  category: string;
+  mainImage: object | null;
+  excerpt: string;
+  body: PortableTextBlock[];
+  steps: Step[] | null;
+}
+
+export async function getStaticPaths() {
+  const slugs = await client.fetch<{ slug: string }[]>(
+    `*[_type == "article"]{ "slug": slug.current }`
+  );
+  return slugs.map(({ slug }) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+
+const article = await client.fetch<Article>(
+  `*[_type == "article" && slug.current == $slug][0]{
+    title,
+    "slug": slug.current,
+    publishedAt,
+    category,
+    mainImage,
+    excerpt,
+    body,
+    steps[]{ _key, title, description }
+  }`,
+  { slug }
+);
+
+if (!article) {
+  return Astro.redirect("/404");
+}
+
+function estimateReadingTime(body: PortableTextBlock[]): number {
+  const text = (body ?? [])
+    .filter((b) => b._type === "block")
+    .flatMap((b) => ((b as any).children ?? []) as { text: string }[])
+    .map((c) => c.text)
+    .join(" ");
+  const words = text.split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.ceil(words / 200));
+}
+
+const readingTime = estimateReadingTime(article.body ?? []);
+const heroImageUrl = article.mainImage
+  ? urlFor(article.mainImage).width(1200).height(630).url()
+  : null;
+const formattedDate = formatDate(article.publishedAt);
+const catSlug = categoryToSlug(article.category);
+const hasSteps = article.steps && article.steps.length > 0;
+
+const articleJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: article.title,
+  description: article.excerpt,
+  image: heroImageUrl ?? undefined,
+  datePublished: article.publishedAt,
+  author: {
+    "@type": "Organization",
+    name: "Sueño Profundo",
+  },
+  publisher: {
+    "@type": "Organization",
+    name: "Sueño Profundo",
+    url: "https://simplesleep.mx",
+  },
+};
+
+const howToJsonLd = hasSteps
+  ? {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      name: article.title,
+      description: article.excerpt,
+      step: article.steps!.map((s, i) => ({
+        "@type": "HowToStep",
+        position: i + 1,
+        name: s.title,
+        text: s.description,
+      })),
+    }
+  : null;
+---
+
+<BaseLayout title={`${article.title} | Sueño Profundo`} description={article.excerpt}>
+  <Fragment slot="head">
+    <!-- OG meta tags -->
+    <meta property="og:type" content="article" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:title" content={article.title} />
+    <meta property="og:description" content={article.excerpt} />
+    {heroImageUrl && <meta property="og:image" content={heroImageUrl} />}
+    <meta property="og:url" content={`https://simplesleep.mx/articulos/${article.slug}`} />
+
+    <!-- JSON-LD: Article -->
+    <script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
+
+    <!-- JSON-LD: HowTo (only when article has steps) -->
+    {howToJsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(howToJsonLd)} />
+    )}
+  </Fragment>
+
+  <Header />
+
+  <main class="article-page" aria-label="Artículo">
+    <!-- Breadcrumb -->
+    <nav aria-label="Migas de pan" class="breadcrumb">
+      <a href="/">Inicio</a>
+      <span aria-hidden="true">›</span>
+      <a href={`/categoria/${catSlug}`}>{article.category}</a>
+      <span aria-hidden="true">›</span>
+      <span aria-current="page">{article.title}</span>
+    </nav>
+
+    <article class="article">
+      <!-- Category tag -->
+      <a href={`/categoria/${catSlug}`} class="category-tag">{article.category}</a>
+
+      <!-- Title -->
+      <h1 class="article-title">{article.title}</h1>
+
+      <!-- Meta row: date + reading time -->
+      <div class="article-meta">
+        <time datetime={article.publishedAt}>{formattedDate}</time>
+        <span aria-hidden="true">·</span>
+        <span>{readingTime} min de lectura</span>
+      </div>
+
+      <!-- Hero image -->
+      {heroImageUrl && (
+        <figure class="hero-figure">
+          <img
+            src={heroImageUrl}
+            alt={article.title}
+            width="1200"
+            height="630"
+            loading="eager"
+            decoding="async"
+            class="hero-image"
+          />
+        </figure>
+      )}
+
+      <!-- Body -->
+      <div class="article-body">
+        <PortableText value={article.body} />
+      </div>
+
+      <!-- Steps / HowTo section -->
+      {hasSteps && (
+        <section class="steps-section" aria-labelledby="steps-heading">
+          <h2 id="steps-heading" class="steps-title">Pasos a seguir</h2>
+          <ol class="steps-list">
+            {article.steps!.map((step, i) => (
+              <li class="step-item">
+                <span class="step-number">{i + 1}</span>
+                <div class="step-content">
+                  <h3 class="step-name">{step.title}</h3>
+                  <p class="step-description">{step.description}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+    </article>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .article-page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: var(--space-10) var(--space-5);
+  }
+
+  .breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-8);
+  }
+
+  .breadcrumb a {
+    color: var(--color-primary);
+  }
+
+  .category-tag {
+    display: inline-block;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-secondary);
+    background-color: var(--color-bg-blue);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-4);
+  }
+
+  .article-title {
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-2xl), 5vw, var(--text-4xl));
+    line-height: 1.2;
+    margin: 0 0 var(--space-4);
+  }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-8);
+  }
+
+  .hero-figure {
+    margin: 0 0 var(--space-8);
+  }
+
+  .hero-image {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    display: block;
+  }
+
+  .article-body {
+    font-size: var(--text-base);
+    line-height: 1.8;
+    color: var(--color-text);
+  }
+
+  .article-body :global(h2) {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    margin-top: var(--space-10);
+    margin-bottom: var(--space-4);
+  }
+
+  .article-body :global(h3) {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+  }
+
+  .article-body :global(p) {
+    margin-bottom: var(--space-5);
+  }
+
+  .article-body :global(ul),
+  .article-body :global(ol) {
+    padding-left: var(--space-6);
+    margin-bottom: var(--space-5);
+  }
+
+  .article-body :global(li) {
+    margin-bottom: var(--space-2);
+  }
+
+  .article-body :global(a) {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .steps-section {
+    margin-top: var(--space-12);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border, #e2e8f0);
+  }
+
+  .steps-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    margin: 0 0 var(--space-6);
+  }
+
+  .steps-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .step-item {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+  }
+
+  .step-number {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: var(--text-sm);
+  }
+
+  .step-content {
+    flex: 1;
+  }
+
+  .step-name {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    margin: 0 0 var(--space-2);
+  }
+
+  .step-description {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+</style>
