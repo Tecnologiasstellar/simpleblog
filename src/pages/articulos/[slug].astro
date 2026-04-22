@@ -4,7 +4,8 @@ import { client, urlFor, formatDate, categoryToSlug } from "../../lib/sanity";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
-import type { PortableTextBlock } from "@portabletext/types";
+import type { PortableTextBlock, PortableTextSpan } from "@portabletext/types";
+import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
 
 interface Step {
   _key: string;
@@ -17,7 +18,7 @@ interface Article {
   slug: string;
   publishedAt: string;
   category: string;
-  mainImage: object | null;
+  mainImage: SanityImageSource | null;
   excerpt: string;
   body: PortableTextBlock[];
   steps: Step[] | null;
@@ -53,8 +54,11 @@ if (!article) {
 function estimateReadingTime(body: PortableTextBlock[]): number {
   const text = (body ?? [])
     .filter((b) => b._type === "block")
-    .flatMap((b) => ((b as any).children ?? []) as { text: string }[])
-    .map((c) => c.text)
+    .flatMap((b) => {
+      const block = b as PortableTextBlock;
+      return (block.children ?? []) as PortableTextSpan[];
+    })
+    .map((c) => c.text ?? "")
     .join(" ");
   const words = text.split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(words / 200));
@@ -71,6 +75,7 @@ const hasSteps = article.steps && article.steps.length > 0;
 const articleJsonLd = {
   "@context": "https://schema.org",
   "@type": "Article",
+  url: `https://simplesleep.mx/articulos/${article.slug}`,
   headline: article.title,
   description: article.excerpt,
   image: heroImageUrl ?? undefined,
@@ -83,6 +88,10 @@ const articleJsonLd = {
     "@type": "Organization",
     name: "Sueño Profundo",
     url: "https://simplesleep.mx",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://simplesleep.mx/logo.png",
+    },
   },
 };
 
@@ -100,6 +109,13 @@ const howToJsonLd = hasSteps
       })),
     }
   : null;
+
+function safeJsonLd(obj: unknown): string {
+  return JSON.stringify(obj)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026");
+}
 ---
 
 <BaseLayout title={`${article.title} | Sueño Profundo`} description={article.excerpt}>
@@ -109,15 +125,28 @@ const howToJsonLd = hasSteps
     <meta property="og:locale" content="es_ES" />
     <meta property="og:title" content={article.title} />
     <meta property="og:description" content={article.excerpt} />
-    {heroImageUrl && <meta property="og:image" content={heroImageUrl} />}
+    {heroImageUrl && (
+      <>
+        <meta property="og:image" content={heroImageUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+      </>
+    )}
     <meta property="og:url" content={`https://simplesleep.mx/articulos/${article.slug}`} />
+    <meta property="og:site_name" content="Sueño Profundo" />
+
+    <!-- Twitter/X card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={article.title} />
+    <meta name="twitter:description" content={article.excerpt} />
+    {heroImageUrl && <meta name="twitter:image" content={heroImageUrl} />}
 
     <!-- JSON-LD: Article -->
-    <script type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
+    <script type="application/ld+json" set:html={safeJsonLd(articleJsonLd)} />
 
     <!-- JSON-LD: HowTo (only when article has steps) -->
     {howToJsonLd && (
-      <script type="application/ld+json" set:html={JSON.stringify(howToJsonLd)} />
+      <script type="application/ld+json" set:html={safeJsonLd(howToJsonLd)} />
     )}
   </Fragment>
 
