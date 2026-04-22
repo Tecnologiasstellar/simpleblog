@@ -1,13 +1,14 @@
 ---
 import { client, categoryToSlug } from "../../lib/sanity";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
 import ArticleCard from "../../components/ArticleCard.astro";
 
 const articles = await client.fetch<
   {
     title: string;
     slug: { current: string };
-    publishedAt: string;
     category: string;
     excerpt: string;
   }[]
@@ -15,7 +16,6 @@ const articles = await client.fetch<
   *[_type == "article"] | order(publishedAt desc) {
     title,
     slug,
-    publishedAt,
     category,
     excerpt
   }
@@ -26,7 +26,8 @@ const articles = await client.fetch<
   title="Artículos sobre sueño | Sueño Profundo"
   description="Guías, consejos y recursos para dormir mejor. Explora todos nuestros artículos sobre sueño saludable."
 >
-  <main class="archive">
+  <Header />
+  <main class="archive" aria-label="Archivo de artículos">
     <header class="archive-header">
       <nav aria-label="Migas de pan" class="breadcrumb">
         <a href="/">Inicio</a>
@@ -39,18 +40,23 @@ const articles = await client.fetch<
       </p>
     </header>
 
-    <div class="article-grid">
-      {articles.map((article) => (
-        <ArticleCard
-          title={article.title}
-          excerpt={article.excerpt}
-          category={article.category}
-          categorySlug={categoryToSlug(article.category)}
-          slug={article.slug.current}
-        />
-      ))}
-    </div>
+    {articles.length > 0 ? (
+      <div class="article-grid">
+        {articles.map((article) => (
+          <ArticleCard
+            title={article.title}
+            excerpt={article.excerpt}
+            category={article.category}
+            categorySlug={categoryToSlug(article.category)}
+            slug={article.slug.current}
+          />
+        ))}
+      </div>
+    ) : (
+      <p class="archive-empty">Todavía no hay artículos publicados. ¡Vuelve pronto!</p>
+    )}
   </main>
+  <Footer />
 </BaseLayout>
 
 <style>
@@ -93,5 +99,11 @@ const articles = await client.fetch<
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: var(--space-8);
+  }
+
+  .archive-empty {
+    color: var(--color-text-muted);
+    font-size: var(--text-base);
+    margin-top: var(--space-8);
   }
 </style>

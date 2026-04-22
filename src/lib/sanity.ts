@@ -5,12 +5,21 @@ import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
 
 const projectId = import.meta.env.PUBLIC_SANITY_PROJECT_ID ?? "";
 
-// Create a stub client that returns empty results when projectId is not configured
-const noopClient = {
-  fetch: async () => [],
-} as unknown as ReturnType<typeof createClient>;
+interface SanityFetchClient {
+  fetch<T = unknown>(query: string, params?: Record<string, unknown>): Promise<T>;
+}
 
-export const client = projectId
+const noopClient: SanityFetchClient = {
+  fetch: async () => [] as unknown as any,
+};
+
+if (!projectId) {
+  console.warn(
+    "[sanity.ts] PUBLIC_SANITY_PROJECT_ID is not set. Using noop client — all queries will return empty arrays."
+  );
+}
+
+export const client: SanityFetchClient = projectId
   ? createClient({
       projectId,
       dataset: import.meta.env.PUBLIC_SANITY_DATASET ?? "production",
@@ -19,12 +28,16 @@ export const client = projectId
     })
   : noopClient;
 
-const builder = projectId
-  ? imageUrlBuilder(client as ReturnType<typeof createClient>)
-  : null;
+const noopBuilder = {
+  width: () => noopBuilder,
+  height: () => noopBuilder,
+  url: () => "",
+} as unknown as ReturnType<ReturnType<typeof imageUrlBuilder>["image"]>;
+
+const builder = projectId ? imageUrlBuilder(client as ReturnType<typeof createClient>) : null;
 
 export function urlFor(source: SanityImageSource) {
-  if (!builder) return { url: () => "" } as ReturnType<ReturnType<typeof imageUrlBuilder>["image"]>;
+  if (!builder) return noopBuilder;
   return builder.image(source);
 }
 
