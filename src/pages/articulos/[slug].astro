@@ -4,6 +4,7 @@ import { client, urlFor, formatDate, categoryToSlug } from "../../lib/sanity";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
 import type { PortableTextBlock, PortableTextSpan } from "@portabletext/types";
 import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
 
@@ -71,6 +72,23 @@ const heroImageUrl = article.mainImage
 const formattedDate = formatDate(article.publishedAt);
 const catSlug = categoryToSlug(article.category);
 const hasSteps = article.steps && article.steps.length > 0;
+
+interface ArticlePreview {
+  title: string;
+  slug: string;
+  category: string;
+  excerpt: string;
+}
+
+const relatedArticles = await client.fetch<ArticlePreview[]>(
+  `*[_type == "article" && category == $category && slug.current != $slug] | order(publishedAt desc)[0..2] {
+    title,
+    "slug": slug.current,
+    category,
+    excerpt
+  }`,
+  { category: article.category, slug: article.slug }
+);
 
 const articleJsonLd = {
   "@context": "https://schema.org",
@@ -214,6 +232,25 @@ function safeJsonLd(obj: unknown): string {
         </section>
       )}
     </article>
+
+    {relatedArticles.length > 0 && (
+      <section class="related-articles" aria-labelledby="related-heading">
+        <h2 id="related-heading" class="related-title">Artículos Relacionados</h2>
+        <ul class="related-grid" role="list">
+          {relatedArticles.map(related => (
+            <li>
+              <ArticleCard
+                title={related.title}
+                excerpt={related.excerpt}
+                category={related.category}
+                categorySlug={categoryToSlug(related.category)}
+                slug={related.slug}
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
   </main>
 
   <Footer />
@@ -375,5 +412,33 @@ function safeJsonLd(obj: unknown): string {
     color: var(--color-text-muted);
     line-height: 1.65;
     margin: 0;
+  }
+
+  .related-articles {
+    max-width: 1200px;
+    margin: var(--space-16) auto 0;
+    padding: var(--space-12) var(--space-5) var(--space-10);
+    border-top: 1px solid var(--color-border, #e2e8f0);
+  }
+
+  .related-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    margin: 0 0 var(--space-8);
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-6);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .related-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
