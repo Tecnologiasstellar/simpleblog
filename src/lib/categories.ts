@@ -94,3 +94,8 @@ export const categories: CategoryConfig[] = [
 export function getCategoryBySlug(slug: string): CategoryConfig | undefined {
   return categories.find(c => c.slug === slug);
 }
+
+export function getLabelSlug(label: string): string {
+  const found = categories.find(c => c.label === label);
+  return found ? found.slug : label.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-');
+}

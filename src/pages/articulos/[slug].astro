@@ -1,6 +1,7 @@
 ---
 import { PortableText } from "astro-portabletext";
 import { client, urlFor, formatDate, categoryToSlug } from "../../lib/sanity";
+import { getLabelSlug } from "../../lib/categories";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
@@ -70,7 +71,7 @@ const heroImageUrl = article.mainImage
   ? urlFor(article.mainImage).width(1200).height(630).url()
   : null;
 const formattedDate = formatDate(article.publishedAt);
-const catSlug = categoryToSlug(article.category);
+const catSlug = getLabelSlug(article.category);
 const hasSteps = article.steps && article.steps.length > 0;
 
 interface ArticlePreview {
@@ -243,7 +244,7 @@ function safeJsonLd(obj: unknown): string {
                 title={related.title}
                 excerpt={related.excerpt}
                 category={related.category}
-                categorySlug={categoryToSlug(related.category)}
+                categorySlug={getLabelSlug(related.category)}
                 slug={related.slug}
               />
             </li>

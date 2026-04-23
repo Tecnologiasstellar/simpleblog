@@ -1,6 +1,6 @@
 ---
-import { categories, getCategoryBySlug, type CategoryConfig } from '../../lib/categories';
-import { client, categoryToSlug } from '../../lib/sanity';
+import { categories, getCategoryBySlug, getLabelSlug, type CategoryConfig } from '../../lib/categories';
+import { client } from '../../lib/sanity';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
@@ -75,7 +75,7 @@ const articles = await client.fetch<ArticlePreview[]>(
                 title={article.title}
                 excerpt={article.excerpt}
                 category={article.category}
-                categorySlug={categoryToSlug(article.category)}
+                categorySlug={getLabelSlug(article.category)}
                 slug={article.slug}
               />
             </li>
