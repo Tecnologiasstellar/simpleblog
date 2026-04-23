@@ -228,7 +228,7 @@ function validateArticle(data) {
 
 // ── Sanity Upload ─────────────────────────────────────────────────────────────
 
-async function uploadToSanity(data) {
+async function uploadToSanity(data, imageAssetRef = null) {
   const slug = toSlug(data.title);
   const docId = `article-${slug}`;
 
@@ -244,7 +244,7 @@ async function uploadToSanity(data) {
     steps: data.steps ?? null,
     seoTitle: data.seoTitle,
     seoDescription: data.seoDescription,
-    image: null,
+    image: imageAssetRef,
     publishedAt: new Date().toISOString().split("T")[0],
   };
 
