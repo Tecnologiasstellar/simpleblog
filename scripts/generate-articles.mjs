@@ -84,6 +84,20 @@ async function generateHeroImage(title) {
   return response.data[0].url;
 }
 
+async function downloadImageBuffer(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Image download failed: ${res.status} ${res.statusText}`);
+  const arrayBuffer = await res.arrayBuffer();
+  return Buffer.from(arrayBuffer);
+}
+
+async function uploadImageToSanity(buffer, slug) {
+  const asset = await sanity.assets.upload("image", buffer, {
+    filename: slug + ".png",
+  });
+  return { _type: "image", asset: { _type: "reference", _ref: asset._id } };
+}
+
 // ── CSV Parser ────────────────────────────────────────────────────────────────
 
 function parseCsvLine(line) {
