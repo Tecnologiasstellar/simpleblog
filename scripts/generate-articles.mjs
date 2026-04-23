@@ -149,10 +149,13 @@ Recuerda: responde SOLO con el JSON válido, sin nada más.`;
 
   const block = message.content.find((b) => b.type === "text");
   if (!block) throw new Error(`No text block in Claude response (stop_reason: ${message.stop_reason})`);
+  if (message.stop_reason === "max_tokens") {
+    throw new Error(`Response truncated (max_tokens) for "${row.keyword}" — increase max_tokens or shorten prompt`);
+  }
   if (message.stop_reason !== "end_turn") {
     console.warn(`Warning: unexpected stop_reason "${message.stop_reason}" for "${row.keyword}"`);
   }
-  const rawText = block.text.trim();
+  const rawText = block.text.trim().replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
   return JSON.parse(rawText);
 }
 

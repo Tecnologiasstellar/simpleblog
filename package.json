@@ -13,11 +13,13 @@
     "generate": "node scripts/generate-articles.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.90.0",
     "@astrojs/sitemap": "^3.7.2",
     "@sanity/client": "^7.21.0",
     "@sanity/image-url": "^2.1.1",
     "astro": "^6.1.8",
     "astro-portabletext": "^0.13.0"
+  },
+  "devDependencies": {
+    "@anthropic-ai/sdk": "^0.90.0"
   }
 }
