@@ -271,7 +271,23 @@ async function main() {
     try {
       const data = await generateArticle(row);
       validateArticle(data);
-      const slug = await uploadToSanity(data);
+      const slug = toSlug(data.title);
+
+      let imageAssetRef = null;
+      if (IMAGE_ENABLED) {
+        try {
+          console.log(`  🖼  Generando imagen para: ${data.title}`);
+          const imageUrl = await generateHeroImage(data.title);
+          const buffer = await downloadImageBuffer(imageUrl);
+          imageAssetRef = await uploadImageToSanity(buffer, slug);
+          console.log(`  ✓ Imagen subida.`);
+        } catch (imgErr) {
+          console.warn(`  ⚠ Imagen fallida para "${data.title}": ${imgErr.message}`);
+        }
+        await delay(5000);
+      }
+
+      await uploadToSanity(data, imageAssetRef);
       success++;
       console.log(`✓ ${num} Publicado: ${data.title} (${data.category})`);
     } catch (err) {
