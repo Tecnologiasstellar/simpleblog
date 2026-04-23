@@ -1,0 +1,167 @@
+---
+import { categories, getCategoryBySlug, getLabelSlug, type CategoryConfig } from '../../lib/categories';
+import { client } from '../../lib/sanity';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+
+interface ArticlePreview {
+  title: string;
+  slug: string;
+  category: string;
+  excerpt: string;
+}
+
+export async function getStaticPaths() {
+  return categories.map(cat => ({
+    params: { category: cat.slug },
+    props: { categoryConfig: cat },
+  }));
+}
+
+interface Props {
+  categoryConfig: CategoryConfig;
+}
+
+const { categoryConfig } = Astro.props;
+
+const articles = await client.fetch<ArticlePreview[]>(
+  `*[_type == "article" && category == $label] | order(publishedAt desc) {
+    title,
+    "slug": slug.current,
+    category,
+    excerpt
+  }`,
+  { label: categoryConfig.label }
+);
+---
+
+<BaseLayout
+  title={`${categoryConfig.label} | Sueño Profundo`}
+  description={categoryConfig.description}
+>
+  <Header />
+
+  <main class="category-page">
+    <div class="container">
+      <!-- Breadcrumb -->
+      <nav aria-label="Migas de pan" class="breadcrumb">
+        <a href="/">Inicio</a>
+        <span aria-hidden="true">›</span>
+        <a href="/categorias">Categorías</a>
+        <span aria-hidden="true">›</span>
+        <span aria-current="page">{categoryConfig.label}</span>
+      </nav>
+
+      <!-- Category header -->
+      <header class="category-header">
+        <span class="category-emoji" aria-hidden="true">{categoryConfig.emoji}</span>
+        <h1 class="category-title">{categoryConfig.label}</h1>
+        <p class="category-description">{categoryConfig.description}</p>
+        <p class="article-count">
+          {articles.length === 0
+            ? 'No hay artículos publicados aún'
+            : `${articles.length} ${articles.length === 1 ? 'artículo' : 'artículos'}`}
+        </p>
+      </header>
+
+      <!-- Article grid -->
+      {articles.length > 0 ? (
+        <ul class="articles-grid" role="list">
+          {articles.map(article => (
+            <li>
+              <ArticleCard
+                title={article.title}
+                excerpt={article.excerpt}
+                category={article.category}
+                categorySlug={getLabelSlug(article.category)}
+                slug={article.slug}
+              />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div class="empty-state">
+          <p>Pronto tendremos artículos sobre <strong>{categoryConfig.label}</strong>. ¡Vuelve pronto!</p>
+        </div>
+      )}
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .category-page {
+    padding: var(--space-10) 0 var(--space-20);
+  }
+
+  .breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-8);
+  }
+
+  .breadcrumb a {
+    color: var(--color-primary);
+  }
+
+  .category-header {
+    text-align: center;
+    margin-bottom: var(--space-12);
+  }
+
+  .category-emoji {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: var(--space-4);
+    line-height: 1;
+  }
+
+  .category-title {
+    font-family: var(--font-display);
+    font-size: clamp(var(--text-2xl), 5vw, var(--text-4xl));
+    color: var(--color-text);
+    margin: 0 0 var(--space-4);
+  }
+
+  .category-description {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    max-width: 560px;
+    margin: 0 auto var(--space-3);
+    line-height: 1.6;
+  }
+
+  .article-count {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-6);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: var(--space-20) var(--space-6);
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 768px) {
+    .articles-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
