@@ -16,6 +16,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@sanity/client";
 import { createReadStream } from "fs";
 import { createInterface } from "readline";
+import OpenAI from "openai";
 
 // ── Env guard ─────────────────────────────────────────────────────────────────
 
@@ -44,6 +45,10 @@ const sanity = createClient({
   apiVersion: "2024-01-01",
 });
 
+const openai = IMAGE_ENABLED
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null;
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function toSlug(title) {
@@ -59,6 +64,24 @@ function toSlug(title) {
 
 function delay(ms) {
   return new Promise((r) => setTimeout(r, ms));
+}
+
+// ── Image Generation ──────────────────────────────────────────────────────────
+
+async function generateHeroImage(title) {
+  const prompt =
+    `Serene, calming editorial photograph for a sleep wellness article about ${title}. ` +
+    "Soft blue and lavender tones, dreamy atmosphere. No text, no watermarks. Professional magazine quality.";
+
+  const response = await openai.images.generate({
+    model: "dall-e-3",
+    prompt,
+    size: "1792x1024",
+    quality: "hd",
+    n: 1,
+  });
+
+  return response.data[0].url;
 }
 
 // ── CSV Parser ────────────────────────────────────────────────────────────────
