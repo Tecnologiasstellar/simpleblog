@@ -1,3 +1,16 @@
+// =============================================================================
+// WEBHOOK SETUP (Sanity → Replit deploy hook)
+// -----------------------------------------------------------------------------
+// 1. Go to https://www.sanity.io/manage → select your project → API → Webhooks
+// 2. Click "Add webhook"
+// 3. URL: [your Replit deploy hook URL]
+// 4. Dataset: production
+// 5. Filter: _type == "article"
+// 6. Trigger on: Create, Update
+// 7. Save — Sanity will POST to your Replit URL whenever an article is created
+//    or updated, triggering a redeploy.
+// =============================================================================
+
 // scripts/generate-articles.mjs
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@sanity/client";
@@ -12,6 +25,11 @@ for (const key of requiredEnv) {
     console.error(`Fatal: missing environment variable ${key}`);
     process.exit(1);
   }
+}
+
+const IMAGE_ENABLED = Boolean(process.env.OPENAI_API_KEY);
+if (!IMAGE_ENABLED) {
+  console.warn("Warning: OPENAI_API_KEY not set — articles will be published without hero images.");
 }
 
 // ── Clients ──────────────────────────────────────────────────────────────────
