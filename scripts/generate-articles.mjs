@@ -4,6 +4,16 @@ import { createClient } from "@sanity/client";
 import { createReadStream } from "fs";
 import { createInterface } from "readline";
 
+// ── Env guard ─────────────────────────────────────────────────────────────────
+
+const requiredEnv = ["ANTHROPIC_API_KEY", "PUBLIC_SANITY_PROJECT_ID", "SANITY_WRITE_TOKEN"];
+for (const key of requiredEnv) {
+  if (!process.env[key]) {
+    console.error(`Fatal: missing environment variable ${key}`);
+    process.exit(1);
+  }
+}
+
 // ── Clients ──────────────────────────────────────────────────────────────────
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -132,7 +142,7 @@ Recuerda: responde SOLO con el JSON válido, sin nada más.`;
 
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-20250514",
-    max_tokens: 4096,
+    max_tokens: 8192,
     system: buildSystemPrompt(),
     messages: [{ role: "user", content: userPrompt }],
   });
@@ -187,14 +197,6 @@ async function uploadToSanity(data) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  const requiredEnv = ["ANTHROPIC_API_KEY", "PUBLIC_SANITY_PROJECT_ID", "SANITY_WRITE_TOKEN"];
-  for (const key of requiredEnv) {
-    if (!process.env[key]) {
-      console.error(`Fatal: missing environment variable ${key}`);
-      process.exit(1);
-    }
-  }
-
   const csvPath = new URL("./keywords.csv", import.meta.url).pathname;
   const rows = await readCsv(csvPath);
   const total = rows.length;
