@@ -35,6 +35,30 @@ function delay(ms) {
 
 // ── CSV Parser ────────────────────────────────────────────────────────────────
 
+function parseCsvLine(line) {
+  const fields = [];
+  let current = "";
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === "," && !inQuotes) {
+      fields.push(current.trim());
+      current = "";
+    } else {
+      current += ch;
+    }
+  }
+  fields.push(current.trim());
+  return fields;
+}
+
 async function readCsv(filePath) {
   const rows = [];
   const rl = createInterface({
@@ -46,7 +70,7 @@ async function readCsv(filePath) {
   for await (const line of rl) {
     const trimmed = line.trim();
     if (!trimmed) continue;
-    const cols = trimmed.split(",").map((c) => c.trim());
+    const cols = parseCsvLine(trimmed);
     if (!headers) {
       headers = cols;
       continue;
@@ -113,7 +137,12 @@ Recuerda: responde SOLO con el JSON válido, sin nada más.`;
     messages: [{ role: "user", content: userPrompt }],
   });
 
-  const rawText = message.content[0].text.trim();
+  const block = message.content.find((b) => b.type === "text");
+  if (!block) throw new Error(`No text block in Claude response (stop_reason: ${message.stop_reason})`);
+  if (message.stop_reason !== "end_turn") {
+    console.warn(`Warning: unexpected stop_reason "${message.stop_reason}" for "${row.keyword}"`);
+  }
+  const rawText = block.text.trim();
   return JSON.parse(rawText);
 }
 
@@ -158,6 +187,14 @@ async function uploadToSanity(data) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
+  const requiredEnv = ["ANTHROPIC_API_KEY", "PUBLIC_SANITY_PROJECT_ID", "SANITY_WRITE_TOKEN"];
+  for (const key of requiredEnv) {
+    if (!process.env[key]) {
+      console.error(`Fatal: missing environment variable ${key}`);
+      process.exit(1);
+    }
+  }
+
   const csvPath = new URL("./keywords.csv", import.meta.url).pathname;
   const rows = await readCsv(csvPath);
   const total = rows.length;
