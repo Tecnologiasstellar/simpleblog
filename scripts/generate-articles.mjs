@@ -81,7 +81,9 @@ async function generateHeroImage(title) {
     n: 1,
   });
 
-  return response.data[0].url;
+  const url = response.data[0]?.url;
+  if (!url) throw new Error("DALL-E returned no image URL");
+  return url;
 }
 
 async function downloadImageBuffer(url) {
@@ -93,7 +95,7 @@ async function downloadImageBuffer(url) {
 
 async function uploadImageToSanity(buffer, slug) {
   const asset = await sanity.assets.upload("image", buffer, {
-    filename: slug + ".png",
+    filename: slug + ".jpg",
   });
   return { _type: "image", asset: { _type: "reference", _ref: asset._id } };
 }
