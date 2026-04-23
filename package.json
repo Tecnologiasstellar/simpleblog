@@ -9,9 +9,11 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "generate": "node scripts/generate-articles.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.90.0",
     "@astrojs/sitemap": "^3.7.2",
     "@sanity/client": "^7.21.0",
     "@sanity/image-url": "^2.1.1",
