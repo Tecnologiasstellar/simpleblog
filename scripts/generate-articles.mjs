@@ -228,9 +228,19 @@ function validateArticle(data) {
   }
 }
 
+// ── Skip-if-exists check ──────────────────────────────────────────────────────
+
+async function articleExistsForKeyword(keyword) {
+  const existing = await sanity.fetch(
+    `*[_type == "article" && sourceKeyword == $kw][0]{_id, title}`,
+    { kw: keyword }
+  );
+  return existing;
+}
+
 // ── Sanity Upload ─────────────────────────────────────────────────────────────
 
-async function uploadToSanity(data, imageAssetRef = null) {
+async function uploadToSanity(data, sourceKeyword, imageAssetRef = null) {
   const slug = toSlug(data.title);
   const docId = `article-${slug}`;
 
@@ -247,6 +257,7 @@ async function uploadToSanity(data, imageAssetRef = null) {
     seoTitle: data.seoTitle,
     seoDescription: data.seoDescription,
     image: imageAssetRef,
+    sourceKeyword,
     publishedAt: new Date().toISOString().split("T")[0],
   };
 
@@ -265,12 +276,20 @@ async function main() {
 
   let success = 0;
   let failed = 0;
+  let skipped = 0;
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     const num = `[${i + 1}/${total}]`;
 
     try {
+      const existing = await articleExistsForKeyword(row.keyword);
+      if (existing) {
+        skipped++;
+        console.log(`⤼ ${num} Skip (ya existe): "${row.keyword}" → ${existing.title}`);
+        continue;
+      }
+
       const data = await generateArticle(row);
       validateArticle(data);
       const slug = toSlug(data.title);
@@ -289,7 +308,7 @@ async function main() {
         await delay(5000);
       }
 
-      await uploadToSanity(data, imageAssetRef);
+      await uploadToSanity(data, row.keyword, imageAssetRef);
       success++;
       console.log(`✓ ${num} Publicado: ${data.title} (${data.category})`);
     } catch (err) {
@@ -302,7 +321,7 @@ async function main() {
     }
   }
 
-  console.log(`\n📊 Resumen: ${success} publicados, ${failed} fallidos de ${total} totales.\n`);
+  console.log(`\n📊 Resumen: ${success} publicados, ${skipped} saltados, ${failed} fallidos de ${total} totales.\n`);
 }
 
 main().catch((err) => {
