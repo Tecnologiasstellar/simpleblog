@@ -40,6 +40,7 @@ const articles = await client.fetch<ArticlePreview[]>(
 <BaseLayout
   title={`${categoryConfig.label} | Sueño Profundo`}
   description={categoryConfig.description}
+  canonicalUrl={`https://simplesleep.mx/categoria/${categoryConfig.slug}`}
 >
   <Header />
 

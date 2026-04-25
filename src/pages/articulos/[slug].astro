@@ -137,28 +137,21 @@ function safeJsonLd(obj: unknown): string {
 }
 ---
 
-<BaseLayout title={`${article.title} | Sueño Profundo`} description={article.excerpt}>
+<BaseLayout
+  title={`${article.title} | Sueño Profundo`}
+  description={article.excerpt}
+  ogImage={heroImageUrl ?? undefined}
+  canonicalUrl={`https://simplesleep.mx/articulos/${article.slug}`}
+>
   <Fragment slot="head">
-    <!-- OG meta tags -->
+    <!-- Override og:type to "article" (BaseLayout defaults to "website") -->
     <meta property="og:type" content="article" />
-    <meta property="og:locale" content="es_ES" />
-    <meta property="og:title" content={article.title} />
-    <meta property="og:description" content={article.excerpt} />
     {heroImageUrl && (
       <>
-        <meta property="og:image" content={heroImageUrl} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
       </>
     )}
-    <meta property="og:url" content={`https://simplesleep.mx/articulos/${article.slug}`} />
-    <meta property="og:site_name" content="Sueño Profundo" />
-
-    <!-- Twitter/X card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={article.title} />
-    <meta name="twitter:description" content={article.excerpt} />
-    {heroImageUrl && <meta name="twitter:image" content={heroImageUrl} />}
 
     <!-- JSON-LD: Article -->
     <script type="application/ld+json" set:html={safeJsonLd(articleJsonLd)} />
