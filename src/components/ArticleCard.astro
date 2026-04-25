@@ -5,6 +5,7 @@ interface Props {
   category: string;
   categorySlug: string;
   slug: string;
+  imageUrl?: string;
   imagePlaceholderLabel?: string;
   featured?: boolean;
 }
@@ -15,6 +16,7 @@ const {
   category,
   categorySlug,
   slug,
+  imageUrl,
   imagePlaceholderLabel = 'Imagen del artículo',
   featured = false,
 } = Astro.props;
@@ -22,9 +24,21 @@ const {
 
 <article class:list={['card', { 'card--featured': featured }]}>
   <a href={`/articulos/${slug}`} class="card-image-link" tabindex="-1" aria-hidden="true">
-    <div class="card-image img-placeholder">
-      <span>{imagePlaceholderLabel}</span>
-    </div>
+    {imageUrl ? (
+      <img
+        src={imageUrl}
+        alt={title}
+        class="card-image card-image--real"
+        width="640"
+        height="360"
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <div class="card-image img-placeholder">
+        <span>{imagePlaceholderLabel}</span>
+      </div>
+    )}
   </a>
 
   <div class="card-body">
@@ -69,6 +83,11 @@ const {
     width: 100%;
     height: 200px;
     border-radius: 0;
+  }
+
+  .card-image--real {
+    object-fit: cover;
+    display: block;
   }
 
   .card--featured .card-image {
