@@ -37,7 +37,7 @@ const articles = await client.fetch<ArticlePreview[]>(
     mainImage
   }`,
   { label: categoryConfig.label }
-);
+).catch(() => [] as ArticlePreview[]);
 ---
 
 <BaseLayout
