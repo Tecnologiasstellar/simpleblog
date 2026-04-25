@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import AboutSection from '../components/AboutSection.astro';
+---
+
+<BaseLayout
+  title="Sobre Nosotros | Sueño Profundo"
+  description="Conoce la misión de Sueño Profundo: llevar información científica y práctica sobre el sueño a todos los hispanohablantes."
+>
+  <Header />
+  <main>
+    <div class="page-hero">
+      <div class="container">
+        <nav aria-label="Migas de pan" class="breadcrumb">
+          <a href="/">Inicio</a>
+          <span aria-hidden="true">›</span>
+          <span aria-current="page">Sobre Nosotros</span>
+        </nav>
+      </div>
+    </div>
+    <AboutSection />
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    padding: var(--space-10) 0 0;
+    background-color: var(--color-surface);
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .breadcrumb a {
+    color: var(--color-primary);
+  }
+</style>
