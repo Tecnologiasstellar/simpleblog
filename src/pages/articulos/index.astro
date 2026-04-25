@@ -1,5 +1,6 @@
 ---
-import { client } from "../../lib/sanity";
+import { client, urlFor } from "../../lib/sanity";
+import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
 import { getLabelSlug } from "../../lib/categories";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
@@ -12,13 +13,15 @@ const articles = await client.fetch<
     slug: { current: string };
     category: string;
     excerpt: string;
+    mainImage: SanityImageSource | null;
   }[]
 >(`
   *[_type == "article"] | order(publishedAt desc) {
     title,
     slug,
     category,
-    excerpt
+    excerpt,
+    mainImage
   }
 `).catch(() => []);
 ---
@@ -51,6 +54,7 @@ const articles = await client.fetch<
             category={article.category}
             categorySlug={getLabelSlug(article.category)}
             slug={article.slug.current}
+            imageUrl={article.mainImage ? urlFor(article.mainImage).width(640).height(360).url() : undefined}
           />
         ))}
       </div>

@@ -1,35 +1,21 @@
 ---
 import ArticleCard from './ArticleCard.astro';
+import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
 
-const featuredArticles = [
-  {
-    title: '10 Técnicas de Relajación para Dormirte en Minutos',
-    excerpt: 'Descubre métodos respaldados por la ciencia para calmar tu mente y preparar tu cuerpo para un sueño profundo.',
-    category: 'Técnicas para Dormir',
-    categorySlug: 'tecnicas-para-dormir',
-    slug: 'tecnicas-relajacion-dormirte-rapido',
-    imagePlaceholderLabel: 'Persona relajada meditando',
-    featured: true,
-  },
-  {
-    title: 'Qué Comer (y Evitar) para Dormir Mejor Esta Noche',
-    excerpt: 'La alimentación tiene un impacto directo en la calidad del sueño. Aquí te explicamos qué alimentos te ayudan y cuáles debes evitar.',
-    category: 'Nutrición y Sueño',
-    categorySlug: 'nutricion-y-sueno',
-    slug: 'alimentos-para-dormir-mejor',
-    imagePlaceholderLabel: 'Alimentos saludables para el sueño',
-    featured: true,
-  },
-  {
-    title: 'Insomnio: Causas, Síntomas y Soluciones Naturales',
-    excerpt: 'El insomnio afecta a millones sin saberlo. Conoce los síntomas clave y qué puedes hacer para superarlo sin medicamentos.',
-    category: 'Trastornos del Sueño',
-    categorySlug: 'trastornos-del-sueno',
-    slug: 'insomnio-causas-soluciones-naturales',
-    imagePlaceholderLabel: 'Persona despierta por la noche',
-    featured: true,
-  },
-];
+interface FeaturedArticle {
+  title: string;
+  excerpt: string;
+  category: string;
+  categorySlug: string;
+  slug: string;
+  imageUrl?: string;
+}
+
+interface Props {
+  featuredArticles?: FeaturedArticle[];
+}
+
+const { featuredArticles = [] } = Astro.props;
 ---
 
 <section class="hero" aria-label="Sección principal">
@@ -72,7 +58,15 @@ const featuredArticles = [
     </div>
     <div class="articles-grid">
       {featuredArticles.map(article => (
-        <ArticleCard {...article} />
+        <ArticleCard
+          title={article.title}
+          excerpt={article.excerpt}
+          category={article.category}
+          categorySlug={article.categorySlug}
+          slug={article.slug}
+          imageUrl={article.imageUrl}
+          featured={true}
+        />
       ))}
     </div>
     <div class="featured-cta">

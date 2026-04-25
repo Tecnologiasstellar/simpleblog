@@ -7,41 +7,64 @@ import CategoryGrid from '../components/CategoryGrid.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import AboutSection from '../components/AboutSection.astro';
 import NewsletterCTA from '../components/NewsletterCTA.astro';
+import { client, urlFor } from '../lib/sanity';
+import { getLabelSlug } from '../lib/categories';
+import type { SanityImageSource } from '@sanity/image-url/lib/types/types';
 
-const recentArticles = [
-  {
-    title: 'Melatonina: Todo lo que Necesitas Saber',
-    excerpt: 'La melatonina es la hormona del sueño, pero ¿realmente funciona como suplemento? Analizamos la evidencia científica.',
-    category: 'Ciencia del Sueño',
-    categorySlug: 'ciencia-del-sueno',
-    slug: 'melatonina-guia-completa',
-    imagePlaceholderLabel: 'Ilustración de ciclo circadiano',
-  },
-  {
-    title: 'Cómo el Estrés Destruye Tu Sueño (y Cómo Detenerlo)',
-    excerpt: 'El cortisol, la hormona del estrés, y el sueño están íntimamente relacionados. Aprende a romper el ciclo vicioso.',
-    category: 'Higiene del Sueño',
-    categorySlug: 'higiene-del-sueno',
-    slug: 'estres-y-sueno-como-manejarlos',
-    imagePlaceholderLabel: 'Persona estresada por la noche',
-  },
-  {
-    title: 'Rutina Nocturna de 30 Minutos para Dormir Profundo',
-    excerpt: 'Una rutina consistente antes de dormir prepara tu cerebro para el descanso. Te mostramos cómo crear la tuya.',
-    category: 'Técnicas para Dormir',
-    categorySlug: 'tecnicas-para-dormir',
-    slug: 'rutina-nocturna-30-minutos',
-    imagePlaceholderLabel: 'Rutina nocturna relajante',
-  },
-  {
-    title: 'Apnea del Sueño: Señales que No Debes Ignorar',
-    excerpt: 'La apnea del sueño afecta a millones sin saberlo. Conoce los síntomas clave y cuándo consultar a un médico.',
-    category: 'Trastornos del Sueño',
-    categorySlug: 'trastornos-del-sueno',
-    slug: 'apnea-del-sueno-senales',
-    imagePlaceholderLabel: 'Persona durmiendo con ronquidos',
-  },
+interface RecentArticle {
+  title: string;
+  excerpt: string;
+  category: string;
+  slug: string;
+  mainImage: SanityImageSource | null;
+}
+
+const recentArticles = await client.fetch<RecentArticle[]>(
+  `*[_type == "article"] | order(publishedAt desc)[0..3] {
+    title,
+    excerpt,
+    category,
+    "slug": slug.current,
+    mainImage
+  }`
+).catch(() => [] as RecentArticle[]);
+
+const FEATURED_SLUGS = [
+  'tecnicas-relajacion-dormirte-rapido',
+  'alimentos-para-dormir-mejor',
+  'insomnio-causas-soluciones-naturales',
 ];
+
+interface FeaturedArticleRaw {
+  title: string;
+  excerpt: string;
+  category: string;
+  slug: string;
+  mainImage: SanityImageSource | null;
+}
+
+const featuredRaw = await client.fetch<FeaturedArticleRaw[]>(
+  `*[_type == "article" && slug.current in $slugs] {
+    title,
+    excerpt,
+    category,
+    "slug": slug.current,
+    mainImage
+  }`,
+  { slugs: FEATURED_SLUGS }
+).catch(() => [] as FeaturedArticleRaw[]);
+
+const featuredArticles = FEATURED_SLUGS
+  .map(slug => featuredRaw.find(a => a.slug === slug))
+  .filter((a): a is FeaturedArticleRaw => a !== undefined)
+  .map(a => ({
+    title: a.title,
+    excerpt: a.excerpt,
+    category: a.category,
+    categorySlug: getLabelSlug(a.category),
+    slug: a.slug,
+    imageUrl: a.mainImage ? urlFor(a.mainImage).width(640).height(360).url() : undefined,
+  }));
 ---
 
 <BaseLayout
@@ -52,7 +75,7 @@ const recentArticles = [
   <Header />
 
   <main>
-    <HeroSection />
+    <HeroSection featuredArticles={featuredArticles} />
     <CategoryGrid />
 
     <!-- Artículos Recientes -->
@@ -69,7 +92,14 @@ const recentArticles = [
         </div>
         <div class="recent-grid">
           {recentArticles.map(article => (
-            <ArticleCard {...article} />
+            <ArticleCard
+              title={article.title}
+              excerpt={article.excerpt}
+              category={article.category}
+              categorySlug={getLabelSlug(article.category)}
+              slug={article.slug}
+              imageUrl={article.mainImage ? urlFor(article.mainImage).width(640).height(360).url() : undefined}
+            />
           ))}
         </div>
       </div>

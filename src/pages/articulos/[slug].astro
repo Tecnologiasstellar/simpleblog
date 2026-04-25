@@ -79,6 +79,7 @@ interface ArticlePreview {
   slug: string;
   category: string;
   excerpt: string;
+  mainImage: SanityImageSource | null;
 }
 
 const relatedArticles = await client.fetch<ArticlePreview[]>(
@@ -86,7 +87,8 @@ const relatedArticles = await client.fetch<ArticlePreview[]>(
     title,
     "slug": slug.current,
     category,
-    excerpt
+    excerpt,
+    mainImage
   }`,
   { category: article.category, slug: article.slug }
 );
@@ -239,6 +241,7 @@ function safeJsonLd(obj: unknown): string {
                 category={related.category}
                 categorySlug={getLabelSlug(related.category)}
                 slug={related.slug}
+                imageUrl={related.mainImage ? urlFor(related.mainImage).width(640).height(360).url() : undefined}
               />
             </li>
           ))}
