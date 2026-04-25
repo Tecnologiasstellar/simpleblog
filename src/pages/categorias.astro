@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import CategoryGrid from '../components/CategoryGrid.astro';
+---
+
+<BaseLayout
+  title="Categorías | Sueño Profundo"
+  description="Explora todas las categorías de Sueño Profundo: técnicas para dormir, higiene del sueño, remedios naturales y más."
+  canonicalUrl="https://simplesleep.mx/categorias"
+>
+  <Header />
+  <main aria-label="Categorías">
+    <header class="page-header">
+      <div class="container">
+        <nav aria-label="Migas de pan" class="breadcrumb">
+          <a href="/">Inicio</a>
+          <span aria-hidden="true">›</span>
+          <span aria-current="page">Categorías</span>
+        </nav>
+        <h1 class="page-title">Todas las categorías</h1>
+        <p class="page-subtitle">Encuentra exactamente lo que necesitas para mejorar tu sueño.</p>
+      </div>
+    </header>
+    <CategoryGrid />
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .page-header {
+    padding: var(--space-10) 0 var(--space-6);
+    background-color: var(--color-bg);
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+  }
+
+  .breadcrumb a {
+    color: var(--color-primary);
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    margin: 0 0 var(--space-2);
+  }
+
+  .page-subtitle {
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+    margin: 0;
+  }
+</style>
